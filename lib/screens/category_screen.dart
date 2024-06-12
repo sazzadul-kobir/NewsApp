@@ -109,7 +109,7 @@ class _CategoryScrenState extends State<CategoryScren> {
                               child:ClipRRect(
                                 borderRadius: BorderRadius.circular(15),
                                 child: CachedNetworkImage(
-                                  imageUrl: snapshot.data!.articles![index].urlToImage!,
+                                  imageUrl: snapshot.data!.articles![index].urlToImage?? "https://www.google.com/url?sa=i&url=https%3A%2F%2Fstock.adobe.com%2Fsearch%2Fimages%3Fk%3Ddefault%2Bimage&psig=AOvVaw30mYQiq2SgdefygMb5I3Sb&ust=1718309299797000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCMihn43v1oYDFQAAAAAdAAAAABAE",
                                   fit: BoxFit.cover,
                                   placeholder: (context, url) => SpinKitFadingCircle(
                                     color: Colors.amber,
