@@ -1,5 +1,13 @@
 
+
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:newsapp/models/headline_models.dart';
+import 'package:newsapp/service/newsapi_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,12 +17,155 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   @override
   Widget build(BuildContext context) {
+    final scHeight=MediaQuery.sizeOf(context).height*1;
+    final scWidth=MediaQuery.sizeOf(context).width*1;
     return Scaffold(
-    body: Text(
-      "home"
-    ),
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: (){},
+            icon: Image.asset("assets/images/category_icon.png",
+            width: 30,
+              height: 30,
+            )
+        ),
+        title: Text("News" ,style: GoogleFonts.poppins(fontSize:24,fontWeight: FontWeight.w700),),
+        centerTitle: true,
+      ),
+      body: ListView(
+        children: [
+          SizedBox(
+
+            height: scHeight*.55,
+            width: double.infinity,
+            child: FutureBuilder<HeadlineModel>(
+              future: NewsApiService().FetchHeadlineData(),
+
+              builder: (context, snapshot){
+                if(snapshot.connectionState==ConnectionState.waiting){
+                  return Center(
+                    child: SpinKitFadingFour(
+                      size: 40,
+                      color: Colors.blue,
+                    ),
+                  );
+                }else if(snapshot.hasError){
+                  return Center(
+                    child: Text(snapshot.error.toString()),
+                  );
+                } else{
+                  return ListView.separated(
+                    separatorBuilder: (context, index) {
+                      return SizedBox(
+                        width: 20,
+                      );
+                    },
+                    itemCount: snapshot.data!.articles!.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder:(context, index){
+                        return SizedBox(
+
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                                Container(
+
+                                  height: scHeight*.6,
+                                  width: scWidth*.9,
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: scWidth*.01
+                                  ),
+
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: CachedNetworkImage(
+                                      imageUrl: snapshot.data!.articles![index].urlToImage!,
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) => SpinKitFadingCircle(
+                                        color: Colors.amber,
+                                        size: 50,
+                                      ),
+                                      errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.redAccent,),
+                                    ),
+                                  ),
+                                ),
+
+
+                              Positioned(
+                                bottom: 20,
+                                child: Card(
+
+                                  color: Colors.white,
+                                  elevation: 5,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15)
+                                  ),
+                                  child: Container(
+
+                                    padding: EdgeInsets.all(10),
+                                    height: scHeight*.22,
+                                    width: scWidth*.8,
+
+                                    
+                                    child: Column(
+
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Center(
+                                            child: Text(
+                                            
+                                                snapshot.data!.articles![index].title!,
+                                              style: GoogleFonts.poppins(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 17,
+                                            
+                                              ),
+                                              maxLines: 2,
+                                              textAlign: TextAlign.center,
+                                              overflow: TextOverflow.ellipsis,
+                                            
+                                            ),
+                                          ),
+                                        ),
+
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              snapshot.data!.articles![index].source!.name!,
+                                              textAlign: TextAlign.end,
+                                              style: GoogleFonts.poppins(
+                                                  fontSize: 15
+                                              ),
+                                            ),
+
+                                            Text(
+
+                                              DateFormat('dd/MM/yy').format(DateTime.parse(snapshot.data!.articles![index].publishedAt!)),
+                                              textAlign: TextAlign.end,
+
+                                            )
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        );
+                      },
+                  );
+                }
+              },
+            ),
+          )
+        ],
+      ),
     );
   }
 }

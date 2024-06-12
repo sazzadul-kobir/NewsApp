@@ -19,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Timer(Duration(seconds: 3),(){
+    Timer(Duration(seconds: 0),(){
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
         return HomeScreen();
       },));
