@@ -7,7 +7,20 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:newsapp/models/headline_models.dart';
+import 'package:newsapp/screens/category_screen.dart';
 import 'package:newsapp/service/newsapi_service.dart';
+
+
+enum Newsoutlet{
+  bbcNews,
+  aryNews,
+  alJazeera,
+  independent,
+  reuters,
+  cnn
+}
+Newsoutlet Selectedenum=Newsoutlet.bbcNews;
+String? SelectedName="bbc-news";
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,6 +28,7 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
+
 
 class _HomeScreenState extends State<HomeScreen> {
 
@@ -24,8 +38,53 @@ class _HomeScreenState extends State<HomeScreen> {
     final scWidth=MediaQuery.sizeOf(context).width*1;
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          PopupMenuButton<Newsoutlet>(
+            initialValue:Selectedenum ,
+              onSelected: (value) {
+                if(Newsoutlet.bbcNews==value){
+                  SelectedName="bbc-news";
+                }
+                if(Newsoutlet.aryNews==value){
+                  SelectedName="ary-news";
+                }
+
+                if(Newsoutlet.alJazeera==value){
+                  SelectedName="al-jazeera-english";
+                }
+
+                setState(() {
+                  Selectedenum=value;
+                });
+              },
+              itemBuilder:(context) => <PopupMenuEntry<Newsoutlet>>[
+                PopupMenuItem(
+
+                  value: Newsoutlet.bbcNews,
+                    child:Text("BBC News")
+                ),
+
+                PopupMenuItem(
+
+                    value: Newsoutlet.aryNews,
+                    child:Text("Ary News")
+                ),
+                PopupMenuItem(
+
+                    value: Newsoutlet.alJazeera,
+                    child:Text("alJazeera")
+                )
+              ],
+          )
+        ],
         leading: IconButton(
-          onPressed: (){},
+          onPressed: (){
+            Navigator.push(context, MaterialPageRoute(
+                builder:(context) {
+                  return CategoryScren();
+                },
+            ));
+          },
             icon: Image.asset("assets/images/category_icon.png",
             width: 30,
               height: 30,
@@ -41,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
             height: scHeight*.55,
             width: double.infinity,
             child: FutureBuilder<HeadlineModel>(
-              future: NewsApiService().FetchHeadlineData(),
+              future: NewsApiService().FetchHeadlineData(selectedName:SelectedName!),
 
               builder: (context, snapshot){
                 if(snapshot.connectionState==ConnectionState.waiting){
@@ -56,12 +115,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Text(snapshot.error.toString()),
                   );
                 } else{
+                  print(snapshot.data!.articles!.length);
                   return ListView.separated(
                     separatorBuilder: (context, index) {
                       return SizedBox(
                         width: 20,
                       );
                     },
+
                     itemCount: snapshot.data!.articles!.length,
                       scrollDirection: Axis.horizontal,
                       itemBuilder:(context, index){
