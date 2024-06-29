@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:newsapp/models/category_news_model.dart';
 
 import '../service/newsapi_service.dart';
+import 'news_details_screen.dart';
 
 class CategoryScren extends StatefulWidget {
   const CategoryScren({super.key});
@@ -97,83 +98,98 @@ class _CategoryScrenState extends State<CategoryScren> {
                   scrollDirection: Axis.vertical,
                   itemBuilder:(context, index){
                     print(snapshot.data!.articles!.length,);
-                    return Container(
-                      padding: EdgeInsets.all(20),
-                      height: scHeight*.20,
-                      width: double.infinity,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(
-                            flex: 2,
-                              child:ClipRRect(
-                                borderRadius: BorderRadius.circular(15),
-                                child: CachedNetworkImage(
-                                  imageUrl: snapshot.data!.articles![index].urlToImage?? "https://www.google.com/url?sa=i&url=https%3A%2F%2Fstock.adobe.com%2Fsearch%2Fimages%3Fk%3Ddefault%2Bimage&psig=AOvVaw30mYQiq2SgdefygMb5I3Sb&ust=1718309299797000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCMihn43v1oYDFQAAAAAdAAAAABAE",
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => SpinKitFadingCircle(
-                                    color: Colors.amber,
-                                    size: 50,
+                    return InkWell(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                            NewsDetails(
+                              newImage: snapshot.data!.articles![index].urlToImage!,
+                              newsTitle: snapshot.data!.articles![index].title!,
+
+                              newsDate:DateFormat('dd-MM-yy').format( DateTime.parse(snapshot.data!.articles![index].publishedAt!)),
+                              description: snapshot.data!.articles![index].description!,
+                              url: snapshot.data!.articles![index].url.toString(),
+                              source: snapshot.data!.articles![index].source!.name.toString(),
+                            )
+                          ));
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(20),
+                        height: scHeight*.20,
+                        width: double.infinity,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(
+                              flex: 2,
+                                child:ClipRRect(
+                                  borderRadius: BorderRadius.circular(15),
+                                  child: CachedNetworkImage(
+                                    imageUrl: snapshot.data!.articles![index].urlToImage?? "https://www.google.com/url?sa=i&url=https%3A%2F%2Fstock.adobe.com%2Fsearch%2Fimages%3Fk%3Ddefault%2Bimage&psig=AOvVaw30mYQiq2SgdefygMb5I3Sb&ust=1718309299797000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCMihn43v1oYDFQAAAAAdAAAAABAE",
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => SpinKitFadingCircle(
+                                      color: Colors.amber,
+                                      size: 50,
+                                    ),
+                                    errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.redAccent,),
                                   ),
-                                  errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.redAccent,),
                                 ),
-                              ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                            flex: 3,
-                              child:Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                
-                                children: [
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Expanded(
+                              flex: 3,
+                                child:Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
 
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        snapshot.data!.articles![index].source!.name!,
-                                        textAlign: TextAlign.end,
-                                        style: GoogleFonts.poppins(
-                                            fontSize: 15
+                                  children: [
+
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          snapshot.data!.articles![index].source!.name!,
+                                          textAlign: TextAlign.end,
+                                          style: GoogleFonts.poppins(
+                                              fontSize: 15
+                                          ),
                                         ),
-                                      ),
-                                      Text(
+                                        Text(
 
-                                        DateFormat('dd/MM/yy').format(DateTime.parse(snapshot.data!.articles![index].publishedAt!)),
-                                        textAlign: TextAlign.end,
+                                          DateFormat('dd/MM/yy').format(DateTime.parse(snapshot.data!.articles![index].publishedAt!)),
+                                          textAlign: TextAlign.end,
 
-                                      )
-                                    ],
-                                  ),
+                                        )
+                                      ],
+                                    ),
 
-                                  Expanded(
-                                    child: Center(
-                                      child: Text(
-                                      
-                                        snapshot.data!.articles![index].title!,
-                                        style: GoogleFonts.poppins(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 17,
-                                      
+                                    Expanded(
+                                      child: Center(
+                                        child: Text(
+
+                                          snapshot.data!.articles![index].title!,
+                                          style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 17,
+
+                                          ),
+                                          maxLines: 2,
+                                          textAlign: TextAlign.start,
+                                          overflow: TextOverflow.ellipsis,
+
                                         ),
-                                        maxLines: 2,
-                                        textAlign: TextAlign.start,
-                                        overflow: TextOverflow.ellipsis,
-                                      
                                       ),
                                     ),
-                                  ),
 
-                                ],
-                              )
-                          )
-                        ],
+                                  ],
+                                )
+                            )
+                          ],
+                        ),
+
+
+
                       ),
-
-
-
                     );
                   },
                 );
